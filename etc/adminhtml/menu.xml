@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Veralidity, LLC
+ *
+ * @package    Veralidity
+ * @category   CardanoDbSync
+ * @copyright  Copyright © 2024 Veralidity, LLC
+ * @license    https://www.veralidity.com/license/
+ * @author     Veralidity, LLC <veralidity@protonmail.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!-- Cardano -> Integrations -> CardanoDbSync -->
+        <add id="Veralidity_CardanoDbSync::menu_integrations_cardanodbsync" title="Cardano DB Sync" module="Veralidity_CardanoDbSync" sortOrder="0" parent="Veralidity_Core::menu_integrations" resource="Veralidity_CardanoDbSync::menu_integrations_cardanodbsync" action="adminhtml/system_config/edit/section/veraliditycardanodbsync" dependsOnModule="Veralidity_Framework" />
+    </menu>
+</config>
