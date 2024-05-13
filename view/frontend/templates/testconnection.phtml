@@ -1,0 +1,73 @@
+<!-- testconnection.phtml -->
+<style type="text/css">
+    h1, h2 { text-transform: none !important; }
+    #maincontent ul {
+      list-style: none;
+      padding-left: 0;
+      font-size: 22px;
+    }
+
+    #maincontent ul li:before {
+      content: '✓';
+      color: green;
+    }
+</style>
+<?php $serverVersion = $block->getServerVersion(); ?>
+<?php $serverDbSync = $block->getSyncPercent(); ?>
+<?php $serverTables = $block->getTables(); ?>
+<?php //$testConnectionResult = $block->getTest(); ?>
+<?php $blocksLatest = $block->getBlocksLatest(); ?>
+
+<h2><div>Server Version: <?php echo $serverVersion; ?></div></h2>
+    <?php if (isset($serverDbSync['sync_percent'])): ?>
+    <h2><div><?php echo $serverDbSync['sync_percent']; ?>% Synced</div></h2>
+    <?php endif; ?>
+<ul>
+<?php foreach ($blocksLatest as $key => $value): ?>
+    <?php foreach ($value as $k => $v): ?>
+        <?php if ($k == 'time'): ?>
+            <?php $v = date('Y-m-d H:i:s', $v); ?>
+        <?php endif;?>
+    <li><?php echo '<strong>' . ucfirst($k) . ':</strong> ' . $v; ?></li>
+    <?php endforeach; ?>
+<?php endforeach; ?>
+</ul>
+<?php var_dump($block->describeTable('slot_leader')); ?>
+<?php foreach ($serverTables as $table): ?>
+    <?php if($table != 'hdb_scheduled_event_invocation_logs'): ?>
+        <?php //var_dump($block->describeTable($table)); ?>
+    <?php endif; ?>
+    <?php echo $table; ?>
+    <br />
+<?php endforeach ?>
+    <?php ?><pre>
+    <?php var_dump($serverTables); ?>
+</pre> <?php ?>
+    
+<?php /* ?>
+    <?php //var_dump($testConnectionResult); ?>
+<?php if (is_array($testConnectionResult) && !empty($testConnectionResult)): ?>
+    <?php if (isset($testConnectionResult[0]['supply'])): ?>
+    <h2>Supply</h2>
+    <?php $supplyData = json_decode($testConnectionResult[0]['supply'], true); ?>
+    <ul>
+        <?php foreach ($supplyData as $key => $value): ?>
+            <li><?php echo ucfirst($key) . ': ' . $value; ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+    <?php if (isset($testConnectionResult[0]['stake'])): ?>
+    <h2>Stake</h2>
+    <?php $stakeData = json_decode($testConnectionResult[0]['stake'], true); ?>
+    <ul>
+        <?php foreach ($stakeData as $key => $value): ?>
+            <li><?php echo ucfirst($key) . ': ' . $value; ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+<?php else: ?>
+    <p>No data available.</p>
+<?php endif; ?>
+<?php */ ?>
+
+

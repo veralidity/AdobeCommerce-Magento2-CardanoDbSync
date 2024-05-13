@@ -1,0 +1,9 @@
+type Query {
+    customData: CustomData @resolver(class: "Veralidity\\CardanoDbSync\\Plugin\\Resolver\\CustomResolver") @doc(description: "Retrieve custom data from PostgreSQL")
+}
+
+type CustomData {
+    id: Int
+    name: String
+    // Define other fields as needed
+}
