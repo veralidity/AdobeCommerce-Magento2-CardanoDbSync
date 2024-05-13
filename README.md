@@ -1,0 +1,1 @@
+This repository is a work in progress and will be updated shortly with our existing, working PostgreSQL adapter extension Adobe Commerce & Magento 2 Open Source as well as a working integration with Cardano DbSync.
