@@ -1,0 +1,1 @@
+This repo is a work in progress and provides Adobe Commerce and Magento 2 Open Source with a PostgreSQL adapter so that we can seamlessly integrate Cardano DbSync. We will update this repository with more details and links to a demo in the days to come.
