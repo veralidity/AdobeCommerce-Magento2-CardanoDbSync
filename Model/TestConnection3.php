@@ -15,6 +15,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\App\ResourceConnection;
 use Veralidity\Framework\Model\ResourceModel\Type\Db\Pdo\Pgsql;
 use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\Module\Dir\Reader as ModuleDirReader;
 
 /**
  * Handler for logging Whitelisted IPs
@@ -37,15 +38,33 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
 
     protected $fileDriver;
 
+    /**
+     * @var ModuleDirReader
+     */
+    private $moduleDirReader;
+
+    /**
+     * Constructor
+     *
+     * @codingStandardsIgnoreStart
+     * @SupassetsWarnings(PHPMD.ExcessiveParameterList)
+     * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
+     * @param ResourceConnection $resourceConnection
+     * @param Pgsql $postgresConnector
+     * @param ModuleDirReader $moduleDirReader
+     * @param $config array
+     */
     public function __construct(
         File $fileDriver,
         ResourceConnection $resourceConnection,
         Pgsql $postgresConnector,
+        ModuleDirReader $moduleDirReader
         array $config = null
     ) {
         $this->fileDriver = $fileDriver;
         $this->postgresConnector = $postgresConnector;
         $this->resourceConnection = $resourceConnection;
+        $this->moduleDirReader = $moduleDirReader;
 
         $config = $this->resourceConnection->getConnection('pgsql')->getConfig();
         //var_dump($config);
@@ -98,10 +117,41 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
         return $this->message;
     }
 
+    public function describeTable($table)
+    {
+        try {
+            //$connection = $this->postgresConnector->getConnection();
+            $this->message = $this->connection->describeTable($table);
+            $sql = "SELECT json_object_keys(to_json(json_populate_record(NULL::schema_name." . $table . ", '{}'::JSON)))";
+            $select = $connection->fetchAll($sql);
+        } catch (\Exception $e) {
+            $this->message = 'Failed to execute the SQL query: ' . $e->getMessage();
+        }
+
+        return $this->message;
+    }
+
+    public function getFilePath($file)
+    {
+        if (!empty($file) && !is_null($file)) {
+            $moduleName = 'Veralidity_CardanoDbSync'; // The name of your module
+            $relativePath = 'sql/cardanodbsync/' . $file;
+            
+            // Get the absolute path to the module's directory
+            $moduleDir = $this->moduleDirReader->getModuleDir('', $moduleName);
+            
+            // Build the full path to the required file
+            $filePath = $moduleDir . '/' . $relativePath;
+
+            return $filePath;
+        }
+    }
+
     public function loadSqlFileForQuery()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/network.sql';
+        $filePath = $this->getFilePath('network/network_all.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -177,10 +227,25 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
         return $results;
     }
 
+    public function getBlocksLatest()
+    {
+        // Path to your .sql file
+        $filePath = $this->getFilePath('blocks/blocks_latest.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/blocks/blocks_latest.sql';
+
+        // Read the content of the .sql file
+        $sqlQuery = $this->fileDriver->fileGetContents($filePath);
+
+        // Execute the SQL query using your PostgresConnector or any other method
+        $result = $this->connection->fetchAll($sqlQuery);
+        return $result;
+    }
+
     public function getNetwork()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
+        $filePath = $this->getFilePath('network/network_all.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -193,7 +258,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getActiveStake()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/active_stake.sql';
+        $filePath = $this->getFilePath('network/active_stake.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/active_stake.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -206,7 +272,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getLiveStake()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/live_stake.sql';
+        $filePath = $this->getFilePath('network/live_stake.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/live_stake.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -219,7 +286,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getCirculatingSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/circulating_supply.sql';
+        $filePath = $this->getFilePath('network/circulating_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/circulating_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -232,7 +300,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getLockedSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/locked_supply.sql';
+        $filePath = $this->getFilePath('network/locked_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/locked_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -245,7 +314,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getMaxSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/max_supply.sql';
+        $filePath = $this->getFilePath('network/max_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/max_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -258,7 +328,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getReservesSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/reserves_supply.sql';
+        $filePath = $this->getFilePath('network/reserves_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/reserves_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -271,7 +342,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getTotalSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/total_supply.sql';
+        $filePath = $this->getFilePath('network/total_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/total_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -284,7 +356,8 @@ class TestConnection3 extends Pgsql implements \Veralidity\CardanoDbSync\Api\Tes
     public function getTreasurySupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/treasury_supply.sql';
+        $filePath = $this->getFilePath('network/treasury_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/treasury_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);

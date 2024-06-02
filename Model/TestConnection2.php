@@ -15,6 +15,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Veralidity\Framework\Model\AbstractModel;
 use Veralidity\CardanoDbSync\Model\PostgresConnector;
 use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\Module\Dir\Reader as ModuleDirReader;
 
 /**
  * Handler for logging Whitelisted IPs
@@ -29,12 +30,29 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
 
     protected $fileDriver;
 
+    /**
+     * @var ModuleDirReader
+     */
+    private $moduleDirReader;
+
+    /**
+     * Constructor
+     *
+     * @codingStandardsIgnoreStart
+     * @SupassetsWarnings(PHPMD.ExcessiveParameterList)
+     * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
+     * @param PostgresConnector $postgresConnector
+     * @param ModuleDirReader $moduleDirReader
+     */
     public function __construct(
         File $fileDriver,
-        PostgresConnector $postgresConnector
+        PostgresConnector $postgresConnector,
+        ModuleDirReader $moduleDirReader
     ) {
         $this->fileDriver = $fileDriver;
         $this->postgresConnector = $postgresConnector;
+        $this->moduleDirReader = $moduleDirReader;
+
         $this->connection = $this->postgresConnector->getConnection();
 
     }
@@ -140,10 +158,28 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
         return $this->message;
     }
 
+    public function getFilePath($file)
+    {
+        if (!empty($file) && !is_null($file)) {
+            $moduleName = 'Veralidity_CardanoDbSync'; // The name of your module
+            $relativePath = 'sql/cardanodbsync/' . $file;
+            
+            // Get the absolute path to the module's directory
+            $moduleDir = $this->moduleDirReader->getModuleDir('', $moduleName);
+            
+            // Build the full path to the required file
+            $filePath = $moduleDir . '/' . $relativePath;
+
+            return $filePath;
+        }
+    }
+
+
     public function loadSqlFileForQuery()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
+        $filePath = $this->getFilePath('network/network_all.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -222,7 +258,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getBlocksLatest()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/blocks/blocks_latest.sql';
+        $filePath = $this->getFilePath('blocks/blocks_latest.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/blocks/blocks_latest.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -235,7 +272,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getNetwork()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
+        $filePath = $this->getFilePath('network/network_all.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/network_all.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -248,7 +286,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getActiveStake()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/active_stake.sql';
+        $filePath = $this->getFilePath('network/active_stake.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/active_stake.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -261,7 +300,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getLiveStake()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/live_stake.sql';
+        $filePath = $this->getFilePath('network/live_stake.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/live_stake.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -274,7 +314,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getCirculatingSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/circulating_supply.sql';
+        $filePath = $this->getFilePath('network/circulating_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/circulating_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -287,7 +328,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getLockedSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/locked_supply.sql';
+        $filePath = $this->getFilePath('network/locked_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/locked_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -300,7 +342,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getMaxSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/max_supply.sql';
+        $filePath = $this->getFilePath('network/max_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/max_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -313,7 +356,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getReservesSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/reserves_supply.sql';
+        $filePath = $this->getFilePath('network/reserves_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/reserves_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -326,7 +370,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getTotalSupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/total_supply.sql';
+        $filePath = $this->getFilePath('network/total_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/total_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);
@@ -339,7 +384,8 @@ class TestConnection2 implements \Veralidity\CardanoDbSync\Api\TestConnectionInt
     public function getTreasurySupply()
     {
         // Path to your .sql file
-        $filePath = '/home/bizon/Projects/Veralidity/magento-demo/app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/treasury_supply.sql';
+        $filePath = $this->getFilePath('network/treasury_supply.sql');
+        //$filePath = 'app/code/Veralidity/CardanoDbSync/sql/cardanodbsync/network/treasury_supply.sql';
 
         // Read the content of the .sql file
         $sqlQuery = $this->fileDriver->fileGetContents($filePath);

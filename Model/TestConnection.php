@@ -13,6 +13,7 @@ namespace Veralidity\CardanoDbSync\Model;
 
 use Magento\Framework\Model\AbstractModel;
 use Veralidity\CardanoDbSync\Model\PostgresConnector;
+use Magento\Framework\Module\Dir\Reader as ModuleDirReader;
 
 /**
  * Handler for logging Whitelisted IPs
@@ -24,6 +25,11 @@ class TestConnection extends AbstractModel
     protected $collectionFactory;
 
     public $message;
+
+    /**
+     * @var ModuleDirReader
+     */
+    private $moduleDirReader;
 
     public function __construct(
         PostgresConnector $postgresConnector
